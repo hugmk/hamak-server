@@ -18,8 +18,8 @@ config.cors = {
 
 //database uris for prod and dev environnements
 config.mongoURI = {
-    local: "mongodb://127.0.0.1:27017/ppd_test",
-    prod: "",
+    local: "mongodb://127.0.0.1:27017/hamakdb",
+    prod: "mongodb+srv://hamaksuperadmin:Nbqj0CkCo9iMIUJ6@hamak.91kfrpn.mongodb.net/hamakdb",
 };
 
 //rate limiting

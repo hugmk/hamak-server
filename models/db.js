@@ -1,7 +1,7 @@
 const config = require("../config");
 const mongoose = require("mongoose");
 
-const url = config.mongoURI.local;
+const url = config.mongoURI.prod;
 
 const options = {
   useNewUrlParser: true,

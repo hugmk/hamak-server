@@ -11,6 +11,7 @@ const RATE_LIMITER = config.rateLimit.local;
 
 var indexRouter = require('./routes/index.router');
 var usersRouter = require('./routes/users.router');
+var productsRouter = require('./routes/products.router');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use(rateLimit(RATE_LIMITER));
 
 app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/products', productsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

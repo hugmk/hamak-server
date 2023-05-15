@@ -7,11 +7,11 @@ start_time = datetime.datetime.now()
 
 # Connexion à la base de données MongoDB
 client = pymongo.MongoClient("mongodb://localhost:27017/")
-db = client["ppd_test"]
+db = client["hamakdb"]
 collection = db["products"]
 
 # Spécifier le chemin d'accès au fichier CSV
-fichier_source = '../french_products.openfoodfacts.csv'
+fichier_source = './french_products.openfoodfacts.csv'
 
 # Parcourir les lignes du fichier CSV et les insérer dans la base de données
 with open(fichier_source, 'r', encoding='utf-8') as input_file:
@@ -135,7 +135,7 @@ with open(fichier_source, 'r', encoding='utf-8') as input_file:
             new_nutrientLevels = ligne['nutrient_levels_tags'].split(',')
             for i in range(len(new_nutrientLevels)):
                 new_nutrientLevels[i] = new_nutrientLevels[i].strip()
-                new_nutrientLevels[i] = allerg_json.get(new_nutrientLevels[i])
+                new_nutrientLevels[i] = nutrientLevels_json.get(new_nutrientLevels[i])
             nutrientLevels_clean = ", ".join(new_nutrientLevels)
         else:
             nutrientLevels_clean = ""
