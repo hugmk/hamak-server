@@ -14,7 +14,7 @@ var controller = {
 
     searchProducts: async (req, res, next) => {
         try {
-            const { q, page = 1, limit = 10 } = req.body;
+            const { q, page = 1, limit = 10 } = req.query;
             const regex = new RegExp(q, 'i');
         
             const products = await Product.find({
@@ -45,6 +45,22 @@ var controller = {
         } catch (err) {
             console.log(err);
             next(err);
+        }
+    },
+
+    getTopProducts: async (req, res, next) => {
+        try {
+          let products = await Product.aggregate([
+            { $match: { calculatedScore: { $gt: 90 } } },
+            { $sample: { size: 12 } },
+          ]);
+          console.log(products);
+
+          res.json(products);
+        }
+        catch(err) {
+          console.log(err);
+          next(err);
         }
     },
 };
