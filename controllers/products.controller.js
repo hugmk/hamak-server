@@ -51,8 +51,8 @@ var controller = {
     getTopProducts: async (req, res, next) => {
         try {
           let products = await Product.aggregate([
-            { $match: { calculatedScore: { $gt: 90 } } },
-            { $sample: { size: 12 } },
+            { $match: { calculatedScore: { $gt: 90 }, image: { $ne: '' } } },
+            { $sample: { size: 6 } },
           ]);
           console.log(products);
 
