@@ -40,7 +40,8 @@ var controller = {
             res.json({
                 products,
                 totalPages: Math.ceil(count / limit),
-                currentPage: parseInt(page)
+                currentPage: parseInt(page),
+                totalProducts: count
             });
         } catch (err) {
             console.log(err);
@@ -56,6 +57,23 @@ var controller = {
           ]);
           console.log(products);
 
+          res.json(products);
+        }
+        catch(err) {
+          console.log(err);
+          next(err);
+        }
+    },
+
+    getAlternatives: async (req, res, next) => {
+        try {
+          const category = req.params.category;
+          let products = await Product.find({
+            calculatedScore: { $gt: 50 },
+            mainCategory: category
+          })
+          .sort({ calculatedScore: -1 })
+          .limit(5);
           res.json(products);
         }
         catch(err) {
