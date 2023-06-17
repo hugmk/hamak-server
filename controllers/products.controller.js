@@ -14,7 +14,7 @@ var controller = {
 
     searchProducts: async (req, res, next) => {
         try {
-            const { q, page = 1, limit = 10 } = req.query;
+            const { q, page = 1, limit = 10, sort } = req.query;
 
             const keywordArray = q.split(' ');
             const searchConditions = keywordArray.map(keyword => ({
@@ -26,9 +26,21 @@ var controller = {
               ]
             }));
 
-            const products = await Product.find({ $and: searchConditions })
+            let products;
+            if(sort) {
+              console.log("has sorting");
+              const sortOption = sort === 'desc' ? -1 : 1;
+              products = await Product.find({ $and: searchConditions })
+              .sort({ calculatedScore: sortOption })
               .skip((page - 1) * limit)
               .limit(parseInt(limit));
+            }
+            else {
+              console.log("no sorting");
+              products = await Product.find({ $and: searchConditions })
+              .skip((page - 1) * limit)
+              .limit(parseInt(limit));
+            }
 
             const count = await Product.countDocuments({ $and: searchConditions });
         
@@ -36,7 +48,8 @@ var controller = {
                 products,
                 totalPages: Math.ceil(count / limit),
                 currentPage: parseInt(page),
-                totalProducts: count
+                totalProducts: count,
+                sort: sort
             });
         } catch (err) {
             console.log(err);
