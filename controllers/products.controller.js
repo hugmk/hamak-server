@@ -15,27 +15,22 @@ var controller = {
     searchProducts: async (req, res, next) => {
         try {
             const { q, page = 1, limit = 10 } = req.query;
-            const regex = new RegExp(q, 'i');
-        
-            const products = await Product.find({
-                $or: [
-                    { name: regex },
-                    { brand: regex },
-                    { mainCategory: regex },
-                    { barcode: regex }
-                ]
-            })
-            .skip((page - 1) * limit)
-            .limit(parseInt(limit));
-        
-            const count = await Product.countDocuments({
-                $or: [
-                    { name: regex },
-                    { brand: regex },
-                    { mainCategory: regex },
-                    { barcode: regex }
-                ]
-            });
+
+            const keywordArray = q.split(' ');
+            const searchConditions = keywordArray.map(keyword => ({
+              $or: [
+                { name: { $regex: keyword, $options: 'i' } },
+                { brand: { $regex: keyword, $options: 'i' } },
+                { mainCategory: { $regex: keyword, $options: 'i' } },
+                { barcode: { $regex: keyword, $options: 'i' } }
+              ]
+            }));
+
+            const products = await Product.find({ $and: searchConditions })
+              .skip((page - 1) * limit)
+              .limit(parseInt(limit));
+
+            const count = await Product.countDocuments({ $and: searchConditions });
         
             res.json({
                 products,
