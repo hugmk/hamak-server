@@ -6,6 +6,7 @@ var logger = require('morgan');
 const cors = require('./middlewares/cors.middleware');
 const helmet = require('helmet');
 const rateLimit = require("express-rate-limit");
+const createError = require('http-errors');
 
 const RATE_LIMITER = config.rateLimit.local;
 

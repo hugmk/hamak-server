@@ -89,6 +89,76 @@ var controller = {
           next(err);
         }
     },
+
+    getBIAnalysis: async (req, res, next) => {
+        try {
+          const category = req.params.category;
+          console.log(category);
+          let bestProducts = await Product.find({
+            calculatedScore: { $gt: 0 },
+            mainCategory: category
+          })
+          .sort({ calculatedScore: -1 })
+          .limit(5);
+
+          let worstProducts = await Product.find({
+            calculatedScore: { $gt: 0 },
+            mainCategory: category
+          })
+          .sort({ calculatedScore: 1 })
+          .limit(5);
+
+          const averagesPipeline = [
+            {
+              $match: {
+                calculatedScore: { $ne: null },
+                mainCategory: category
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                averageScore: { $avg: "$calculatedScore" },
+                averageProteins: { $avg: "$proteins_100g" },
+                averageSalt: { $avg: "$salt_100g" },
+                averageSodium: { $avg: "$sodium_100g" },
+                averageSugars: { $avg: "$sugars_100g" },
+                averageFiber: { $avg: "$fiber_100g" },
+                averageFat: { $avg: "$fat_100g" },
+                averageSaturatedFat: { $avg: "$saturated_fat_100g" },
+                averageCarbohydrates: { $avg: "$carbohydrates_100g" },
+                averageEcoscore: { $avg: "$ecoscoreScore" },
+                averageEnergyKcal: { $avg: "$energy_kcal_100g" }
+              }
+            }
+          ];
+          const averageScoreResult = await Product.aggregate(averagesPipeline);
+
+          let result = {
+            "bestProducts": bestProducts,
+            "worstProducts": worstProducts,
+            "averages": {
+              averageScore: averageScoreResult.length > 0 ? averageScoreResult[0].averageScore : 0,
+              averageEcoscore: averageScoreResult.length > 0 ? averageScoreResult[0].averageEcoscore : 0,
+              averageEnergyKcal: averageScoreResult.length > 0 ? averageScoreResult[0].averageEnergyKcal : 0,
+              averageFat: averageScoreResult.length > 0 ? averageScoreResult[0].averageFat : 0,
+              averageSaturatedFat: averageScoreResult.length > 0 ? averageScoreResult[0].averageSaturatedFat : 0,
+              averageCarbohydrates: averageScoreResult.length > 0 ? averageScoreResult[0].averageCarbohydrates : 0,
+              averageSugars: averageScoreResult.length > 0 ? averageScoreResult[0].averageSugars : 0,
+              averageProteins: averageScoreResult.length > 0 ? averageScoreResult[0].averageProteins : 0,
+              averageFiber: averageScoreResult.length > 0 ? averageScoreResult[0].averageFiber : 0,
+              averageSalt: averageScoreResult.length > 0 ? averageScoreResult[0].averageSalt : 0,
+              averageSodium: averageScoreResult.length > 0 ? averageScoreResult[0].averageSodium : 0,
+            }
+          }
+
+          res.json(result);
+        }
+        catch(err) {
+          console.log(err);
+          next(err);
+        }
+    },
 };
 
 module.exports = controller;
